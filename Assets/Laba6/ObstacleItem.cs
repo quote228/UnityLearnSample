@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events; // Для использования UnityEvent
+using UnityEngine.Events;
 
 public class ObstacleItem : MonoBehaviour
 {
-    public float currentValue = 1f; // "Здоровье" препятствия (от 0 до 1)
+    public float currentValue = 1f; // Здоровье объекта
     public UnityEvent onDestroyObstacle; // Событие для уничтожения объекта
+    public GameObject prefabToSpawn; // Префаб, который нужно создать
 
     private Renderer objectRenderer; // Для изменения цвета объекта
 
@@ -15,7 +16,7 @@ public class ObstacleItem : MonoBehaviour
         objectRenderer = GetComponent<Renderer>(); // Получаем компонент Renderer для изменения цвета
     }
 
-    // Метод, который будет вызываться для нанесения урона
+    // Метод для нанесения урона объекту
     public void GetDamage(float value)
     {
         currentValue -= value; // Уменьшаем здоровье
@@ -26,11 +27,22 @@ public class ObstacleItem : MonoBehaviour
 
         if (currentValue <= 0)
         {
-            // Когда здоровье достигает 0, запускаем событие
+            // Когда здоровье объекта достигает нуля, вызываем событие
             onDestroyObstacle.Invoke();
+            Use(); // Создаем новый префаб на месте уничтоженного объекта
+            Destroy(gameObject); // Удаляем объект
+        }
+    }
 
-            // Удаляем объект
-            Destroy(gameObject);
+    // Метод для использования объекта (создание префаба)
+    private void Use()
+    {
+        if (prefabToSpawn != null)
+        {
+            // Создаем новый объект на месте текущего объекта
+            Vector3 spawnPosition = transform.position;
+            Quaternion spawnRotation = Quaternion.identity;
+            Instantiate(prefabToSpawn, spawnPosition, spawnRotation);
         }
     }
 }
